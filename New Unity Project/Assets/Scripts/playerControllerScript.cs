@@ -26,23 +26,34 @@ public class playerControllerScript : MonoBehaviour {
 
     void Update()
     {
+        
         groundedPlayer = controller.isGrounded;
-        if (groundedPlayer && playerVelocity.y < 0)
-        {
-            playerVelocity.y = 0f;
-        }
-
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         if (groundedPlayer)
         {
-            controller.Move(move * Time.deltaTime * runSpeed);
+            playerVelocity.y = 0.1f;
+        }
+        
+        // basic movement x + y
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
+        Vector3 move = new Vector3(horizontal, 0f, vertical).normalized;
+
+        if (move.magnitude >= 0.1f)
+        {
+            controller.Move(move * runSpeed * Time.deltaTime);
+        }
+        // only allow movement while grounded. this prevents movement while jumping (balancing)
+        if (groundedPlayer)
+        {
+
         }
 
-        // Changes the height position of the player..
-        if (Input.GetKeyDown("n") && groundedPlayer)
-        { 
-        playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
-            Debug.Log("Error");
+        // when spacebar is pressed 
+        if (Input.GetButtonDown("Jump"))
+        {
+            horizontal = 0f;
+            vertical = 0f;
+            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
         }
 
         playerVelocity.y += gravityValue * Time.deltaTime;

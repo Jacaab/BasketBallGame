@@ -7,7 +7,7 @@ public class ballCoreScript : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		self.transform.rotation = Quaternion.Euler(58, 0, 0);
+		self.transform.rotation = Quaternion.Euler(45, 0, 0);
 
 	}
 }
