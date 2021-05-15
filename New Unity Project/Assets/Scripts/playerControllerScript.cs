@@ -30,7 +30,7 @@ public class playerControllerScript : MonoBehaviour {
         groundedPlayer = controller.isGrounded;
         if (groundedPlayer)
         {
-            playerVelocity.y = 0.1f;
+            playerVelocity.y = 0f;
         }
         
         // basic movement x + y
@@ -51,8 +51,6 @@ public class playerControllerScript : MonoBehaviour {
         // when spacebar is pressed 
         if (Input.GetButtonDown("Jump"))
         {
-            horizontal = 0f;
-            vertical = 0f;
             playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
         }
 

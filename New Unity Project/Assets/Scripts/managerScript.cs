@@ -11,6 +11,8 @@ public class managerScript : MonoBehaviour
     public GameObject player3;
     public GameObject player4;
 
+    private Collider[] ballCollisions;
+
     private bool ballPossessed = false;
     private GameObject possessionTracker = null;
 
@@ -63,15 +65,27 @@ public class managerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (getBallPossessed() == true)
         {
-            ball.transform.position = getPossessionTracker().GetComponent("handPos").transform.position;
+            ball.GetComponent<SphereCollider>().enabled = false;
+            ball.transform.position = getPossessionTracker().transform.GetChild(1).position; //GameObject.FindGameObjectWithTag("handPos").transform.position;
         }
 
         if (getBallPossessed() == false)
         {
-            //pickupCollision()
+            ballCollisions = Physics.OverlapSphere(ball.transform.position, 0.5f);
+            foreach (Collider index in ballCollisions)
+            {
+                if (index.CompareTag("playerEntity"))
+                {
+                    setPossessionTracker(index.gameObject, true);
+                }
+            }
         }
+
+
+        
 
     }
 }
