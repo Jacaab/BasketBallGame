@@ -13,20 +13,14 @@ public class managerScript : MonoBehaviour
 
     private Collider[] ballCollisions;
 
+    public bool ballShotCheck = false;
     private bool ballPossessed = false;
     private GameObject possessionTracker = null;
-
 
     // is the ball in possession?
     bool getBallPossessed()
     {
         return ballPossessed;
-    }
-
-    // set ball possession check
-    void setBallPossession(bool swap)
-    {
-        ballPossessed = swap;
     }
 
     // who has the ball?
@@ -36,25 +30,30 @@ public class managerScript : MonoBehaviour
     }
 
     // set who has the ball
-    void setPossessionTracker(GameObject possessor, bool possessionLock)
+    // ( who has the ball now? , set to true )
+    void setPossessionTracker(GameObject possessor, bool _possessionLock)
     {
         possessionTracker = possessor;
-        setBallPossession(possessionLock);
+        ballPossessed = _possessionLock;
     }
 
-    // clear possession
+    // clear possession sets all possession variables to null
     void clearPossession()
     {
         setPossessionTracker(null, false);
     }
 
-    void pickupCollision(Collision col)
+    // ball drop funcrion
+    void shotCall()
     {
-        if (col.gameObject.tag == "playerEntity")
-        {
-            setPossessionTracker(col.gameObject, true);
-        }
+        clearPossession();          // clear possession to stop the ball being forced onto the player hand pos
+                                    // apply a force to move the ball away  from the player > towards the hoop
+                                    // start a small timer to wait for the ball to leave the player
+        ball.GetComponent<SphereCollider>().enabled = false;        // re enable collision of the ball
+        ballShotCheck = false;                                      // reset shot check system
+        Debug.Log("Shot call Func");
     }
+
 
     // Start is called before the first frame update
     void Start()
@@ -68,9 +67,12 @@ public class managerScript : MonoBehaviour
 
         if (getBallPossessed() == true)
         {
-            ball.GetComponent<SphereCollider>().enabled = false;
-            ball.transform.position = getPossessionTracker().transform.GetChild(1).position; //GameObject.FindGameObjectWithTag("handPos").transform.position;
+            ball.GetComponent<SphereCollider>().enabled = false;    // disabled to stop the ball trying to leave the set position   // re enable when no longer needed
+            ball.transform.position = getPossessionTracker().transform.GetChild(1).position;
+
+
         }
+
 
         if (getBallPossessed() == false)
         {
@@ -81,10 +83,15 @@ public class managerScript : MonoBehaviour
                 {
                     setPossessionTracker(index.gameObject, true);
                 }
+
             }
+
         }
 
-
+        if (ballShotCheck == true)
+        {
+            shotCall();
+        }
         
 
     }

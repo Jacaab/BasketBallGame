@@ -54,6 +54,11 @@ public class playerControllerScript : MonoBehaviour {
             playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
         }
 
+        if (Input.GetKeyDown("j"))
+        {
+            manager.GetComponent<managerScript>().ballShotCheck = true;
+        }
+
         playerVelocity.y += gravityValue * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
     }
