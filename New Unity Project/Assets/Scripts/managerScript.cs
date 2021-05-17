@@ -13,9 +13,9 @@ public class managerScript : MonoBehaviour
 
     private Collider[] ballCollisions;
 
-    public bool ballShotCheck = false;
-    private bool ballPossessed = false;
-    private GameObject possessionTracker = null;
+    public bool ballShotCheck = false;              // allows players to attempt a shot from outside this script by making this true
+    private bool ballPossessed = false;             // locks certain actions happening when someone has possession of the ball
+    private GameObject possessionTracker = null;    // tracks which player has the ball currently // used for calculating shot tragectory and setting the balls position to the hand
 
     // is the ball in possession?
     bool getBallPossessed()
@@ -43,13 +43,16 @@ public class managerScript : MonoBehaviour
         setPossessionTracker(null, false);
     }
 
-    // ball drop funcrion
+    // player attempts to shoot the ball
     void shotCall()
     {
         clearPossession();          // clear possession to stop the ball being forced onto the player hand pos
-                                    // apply a force to move the ball away  from the player > towards the hoop
-                                    // start a small timer to wait for the ball to leave the player
-        ball.GetComponent<SphereCollider>().enabled = false;        // re enable collision of the ball
+        
+        // TODO: apply a force to move the ball away  from the player > towards the hoop
+        
+        
+        // TODO: start a small timer to wait for the ball to leave the player
+        ball.GetComponent<SphereCollider>().enabled = true;        // re enable collision of the ball
         ballShotCheck = false;                                      // reset shot check system
         Debug.Log("Shot call Func");
     }
@@ -64,30 +67,32 @@ public class managerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        //  if the ball is in possession of a player
         if (getBallPossessed() == true)
         {
-            ball.GetComponent<SphereCollider>().enabled = false;    // disabled to stop the ball trying to leave the set position   // re enable when no longer needed
-            ball.transform.position = getPossessionTracker().transform.GetChild(1).position;
+            ball.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);       // set the ball velocity to 0 to prevent endlessly falling 
+            ball.GetComponent<SphereCollider>().enabled = false;                // disabled to stop the ball trying to leave the set position   // re enable when no longer needed
+            ball.transform.position = getPossessionTracker().transform.GetChild(1).position; // set ball position to the players hand position
 
 
         }
 
-
+        //   if the ball is not possessed by a player
         if (getBallPossessed() == false)
         {
-            ballCollisions = Physics.OverlapSphere(ball.transform.position, 0.5f);
+            ballCollisions = Physics.OverlapSphere(ball.transform.position, 0.55f);     // search for a player coliding with the ball
             foreach (Collider index in ballCollisions)
             {
                 if (index.CompareTag("playerEntity"))
                 {
-                    setPossessionTracker(index.gameObject, true);
+                    setPossessionTracker(index.gameObject, true);                       // if a player is found set the player to the possession tracker
                 }
 
             }
 
         }
 
+        // if a player attempts a shot then ball shot check will be changed to true
         if (ballShotCheck == true)
         {
             shotCall();

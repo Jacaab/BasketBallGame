@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class playerControllerScript : MonoBehaviour {
 
-    private CharacterController controller;
-    private Vector3 playerVelocity;
-    private bool groundedPlayer;
-    private float gravityValue = -10f;
-    public float playerHeight = 6.0f;
-    public float playerWidth = 1.2f;
-    public float runSpeed = 4.0f;
-    public float jumpHeight = 15.0f;
-    public string spritePrefix; //can maybe use this to load different sprites for different characters in the future using the same script. NOT TESTED
+    private CharacterController controller;     // handles controls and physics
+    private Vector3 playerVelocity;             
+    private bool groundedPlayer;                // system to allow jump mechanic and fix bugs from custom physics
+    private float gravityValue = -10f;          // how stong gravity is // should be a universal value // maybe move to manager
+    public float playerHeight = 6.0f;           // {
+    public float playerWidth = 1.2f;            //      these will be changed dependant on character selection
+    public float runSpeed = 4.0f;               //      and change how the contoller will interact
+    public float jumpHeight = 15.0f;            // }
+    public string spritePrefix;                 //can maybe use this to load different sprites for different characters in the future using the same script. NOT TESTED
 
     public GameObject manager;
     public GameObject ball;
@@ -26,39 +26,44 @@ public class playerControllerScript : MonoBehaviour {
 
     void Update()
     {
-        
-        groundedPlayer = controller.isGrounded;
-        if (groundedPlayer)
+        // isGrounded system to stop the player from being slowed down by floor collisions from gravity
+        if (controller.isGrounded)
         {
-            playerVelocity.y = 0f;
+            groundedPlayer = true;  
+            playerVelocity.y = 0f;  // set velocity to 0 to prevent endless falling which prevents jumping
         }
-        
+
         // basic movement x + y
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 move = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (move.magnitude >= 0.1f)
-        {
-            controller.Move(move * runSpeed * Time.deltaTime);
-        }
+
         // only allow movement while grounded. this prevents movement while jumping (balancing)
         if (groundedPlayer)
         {
-
+            if (move.magnitude >= 0.1f)
+            {
+                controller.Move(move * runSpeed * Time.deltaTime);
+            }
+            
         }
 
-        // when spacebar is pressed 
-        if (Input.GetButtonDown("Jump"))
+
+        // when spacebar is pressed and the player is grounded do a jump based on jump height var
+        if (Input.GetKeyDown("k") && groundedPlayer)
         {
             playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+            groundedPlayer = false;
         }
 
+        // when j is pressed attempt a shot // shot function  is handled by the manager
         if (Input.GetKeyDown("j"))
         {
             manager.GetComponent<managerScript>().ballShotCheck = true;
         }
 
+        // gravity
         playerVelocity.y += gravityValue * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
     }
