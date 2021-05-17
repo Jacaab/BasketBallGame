@@ -5,6 +5,7 @@ using UnityEngine;
 public class managerScript : MonoBehaviour
 {
     public GameObject ball;
+    public GameObject hoop;
 
     public GameObject player1;
     public GameObject player2;
@@ -31,9 +32,9 @@ public class managerScript : MonoBehaviour
 
     // set who has the ball
     // ( who has the ball now? , set to true )
-    void setPossessionTracker(GameObject possessor, bool _possessionLock)
+    void setPossessionTracker(GameObject _possessor, bool _possessionLock)
     {
-        possessionTracker = possessor;
+        possessionTracker = _possessor;
         ballPossessed = _possessionLock;
     }
 
@@ -46,10 +47,12 @@ public class managerScript : MonoBehaviour
     // player attempts to shoot the ball
     void shotCall()
     {
+        //ball.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
         clearPossession();          // clear possession to stop the ball being forced onto the player hand pos
-        
+
         // TODO: apply a force to move the ball away  from the player > towards the hoop
-        
+        ball.GetComponent<Rigidbody>().AddForce(ball.transform.up * 5, ForceMode.VelocityChange);
+        ball.GetComponent<Rigidbody>().AddForce((hoop.transform.position - ball.transform.position), ForceMode.VelocityChange); //MovePosition(hoop.transform.position);   
         
         // TODO: start a small timer to wait for the ball to leave the player
         ball.GetComponent<SphereCollider>().enabled = true;        // re enable collision of the ball
