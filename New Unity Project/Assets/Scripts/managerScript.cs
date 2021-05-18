@@ -42,7 +42,6 @@ public class managerScript : MonoBehaviour
     // clear possession sets all possession variables to null
     void clearPossession()
     {
-        //setPossessionTracker(null, false);
         getPossessionTracker().GetComponent<playerControllerScript>().possession = false;
         possessionTracker = null;
         ballPossessed = false;
@@ -51,20 +50,22 @@ public class managerScript : MonoBehaviour
     // player attempts to shoot the ball
     void shotCall()
     {
-        //ball.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+        // calculate the shot accuracy based on shot takers stats
+        float asdef = getPossessionTracker().GetComponent<playerControllerScript>().shotAccuracy;                               // get the shot takers accuracy stat
+        asdef = (asdef / 10);                                                                                                   // turn shot acc stat into a decimal
+        asdef = Random.Range(-asdef, asdef);                                                                                    // use decimal as a random multiplier from negative stat to positive stat
+
         clearPossession();                                                                                                      // clear possession to stop the ball being forced onto the player hand pos            
-                                                                                                                          
-        // TODO: start a small timer to wait for the ball to leave the player                                             
+
         ball.GetComponent<SphereCollider>().enabled = true;                                                                     // re enable collision of the ball                     
 
-        // TODO: apply a force to move the ball away  from the player > towards the hoop                                  
-        ball.GetComponent<Transform>().rotation = Quaternion.Euler(0, 0, 0);                                                    // reset rotation to prevent weird physics
-        ball.GetComponent<Rigidbody>().AddForce(ball.transform.up * 7, ForceMode.VelocityChange);                               // add force upwards to create an arc
+        // apply a force to move the ball away from the player > towards the hoop                                  
+        ball.GetComponent<Transform>().rotation = Quaternion.Euler(0, 0, 0);                                                    // reset rotation to prevent weird physics      
+        ball.GetComponent<Rigidbody>().AddForce(ball.transform.up * (7 + asdef), ForceMode.VelocityChange);                     // add force upwards to create an arc
         ball.GetComponent<Rigidbody>().AddForce((hoop.transform.position - ball.transform.position) * 0.8f, ForceMode.VelocityChange); // add force towards the hoop   
 
         ballShotCheck = false;                                                                                                  // reset shot check system
     }
-
 
     // Start is called before the first frame update
     void Start()
@@ -78,10 +79,10 @@ public class managerScript : MonoBehaviour
         //  if the ball is in possession of a player
         if (getBallPossessed() == true)
         {
-            ball.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);       // set the ball velocity to 0 to prevent endlessly falling 
+            ball.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);                    // set the ball velocity to 0 to prevent endlessly falling 
             
-            //ball.GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
-            ball.GetComponent<SphereCollider>().enabled = false;                // disabled to stop the ball trying to leave the set position   // re enable when no longer needed
+            
+            ball.GetComponent<SphereCollider>().enabled = false;                             // disabled to stop the ball trying to leave the set position   // re enable when no longer needed
             ball.transform.position = getPossessionTracker().transform.GetChild(1).position; // set ball position to the players hand position
 
 
@@ -107,7 +108,5 @@ public class managerScript : MonoBehaviour
         {
             shotCall();
         }
-        
-
     }
 }

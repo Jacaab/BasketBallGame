@@ -12,14 +12,15 @@ public class playerControllerScript : MonoBehaviour {
     public float playerWidth = 1.2f;            //      these will be changed dependant on character selection
     public float runSpeed = 4.0f;               //      and change how the contoller will interact
     public float jumpHeight = 15.0f;            // }
-    public string spritePrefix;                 //can maybe use this to load different sprites for different characters in the future using the same script. NOT TESTED
+    public int shotAccuracy = 5;
+    public string spritePrefix;                 // can maybe use this to load different sprites for different characters in the future using the same script. NOT TESTED
 
     public bool possession = false;
 
     public GameObject manager;
     public GameObject ball;
 
-    private void Start()
+    private void Start()                        // maybe use a public state to determin stats ie. state 1 == default stats, state 2 == tall stats etc.
     {
         controller = gameObject.GetComponent<CharacterController>();
         controller.radius = playerWidth;
