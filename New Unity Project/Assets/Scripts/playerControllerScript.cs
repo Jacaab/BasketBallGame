@@ -14,6 +14,8 @@ public class playerControllerScript : MonoBehaviour {
     public float jumpHeight = 15.0f;            // }
     public string spritePrefix;                 //can maybe use this to load different sprites for different characters in the future using the same script. NOT TESTED
 
+    public bool possession = false;
+
     public GameObject manager;
     public GameObject ball;
 
@@ -60,7 +62,15 @@ public class playerControllerScript : MonoBehaviour {
         // when j is pressed attempt a shot // shot function  is handled by the manager
         if (Input.GetKeyDown("j"))
         {
-            manager.GetComponent<managerScript>().ballShotCheck = true;
+            if (possession == true)
+            { 
+                manager.GetComponent<managerScript>().ballShotCheck = true;
+            }
+
+            if (possession == false)
+            {
+                
+            }
         }
 
         // gravity

@@ -34,6 +34,7 @@ public class managerScript : MonoBehaviour
     // ( who has the ball now? , set to true )
     void setPossessionTracker(GameObject _possessor, bool _possessionLock)
     {
+        _possessor.gameObject.GetComponent<playerControllerScript>().possession = _possessionLock;
         possessionTracker = _possessor;
         ballPossessed = _possessionLock;
     }
@@ -41,23 +42,27 @@ public class managerScript : MonoBehaviour
     // clear possession sets all possession variables to null
     void clearPossession()
     {
-        setPossessionTracker(null, false);
+        //setPossessionTracker(null, false);
+        getPossessionTracker().GetComponent<playerControllerScript>().possession = false;
+        possessionTracker = null;
+        ballPossessed = false;
     }
 
     // player attempts to shoot the ball
     void shotCall()
     {
         //ball.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
-        clearPossession();          // clear possession to stop the ball being forced onto the player hand pos
+        clearPossession();                                                                                                      // clear possession to stop the ball being forced onto the player hand pos            
+                                                                                                                          
+        // TODO: start a small timer to wait for the ball to leave the player                                             
+        ball.GetComponent<SphereCollider>().enabled = true;                                                                     // re enable collision of the ball                     
 
-        // TODO: apply a force to move the ball away  from the player > towards the hoop
-        ball.GetComponent<Rigidbody>().AddForce(ball.transform.up * 5, ForceMode.VelocityChange);
-        ball.GetComponent<Rigidbody>().AddForce((hoop.transform.position - ball.transform.position), ForceMode.VelocityChange); //MovePosition(hoop.transform.position);   
-        
-        // TODO: start a small timer to wait for the ball to leave the player
-        ball.GetComponent<SphereCollider>().enabled = true;        // re enable collision of the ball
-        ballShotCheck = false;                                      // reset shot check system
-        Debug.Log("Shot call Func");
+        // TODO: apply a force to move the ball away  from the player > towards the hoop                                  
+        ball.GetComponent<Transform>().rotation = Quaternion.Euler(0, 0, 0);                                                    // reset rotation to prevent weird physics
+        ball.GetComponent<Rigidbody>().AddForce(ball.transform.up * 7, ForceMode.VelocityChange);                               // add force upwards to create an arc
+        ball.GetComponent<Rigidbody>().AddForce((hoop.transform.position - ball.transform.position) * 0.8f, ForceMode.VelocityChange); // add force towards the hoop   
+
+        ballShotCheck = false;                                                                                                  // reset shot check system
     }
 
 
@@ -74,6 +79,8 @@ public class managerScript : MonoBehaviour
         if (getBallPossessed() == true)
         {
             ball.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);       // set the ball velocity to 0 to prevent endlessly falling 
+            
+            //ball.GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
             ball.GetComponent<SphereCollider>().enabled = false;                // disabled to stop the ball trying to leave the set position   // re enable when no longer needed
             ball.transform.position = getPossessionTracker().transform.GetChild(1).position; // set ball position to the players hand position
 
