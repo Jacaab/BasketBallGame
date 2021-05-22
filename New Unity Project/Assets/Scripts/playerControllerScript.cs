@@ -6,25 +6,68 @@ public class playerControllerScript : MonoBehaviour {
 
     private CharacterController controller;     // handles controls and physics
     private Vector3 playerVelocity;             
-    private bool groundedPlayer;                // system to allow jump mechanic and fix bugs from custom physics
-    private float gravityValue = -10f;          // how stong gravity is // should be a universal value // maybe move to manager
-    public float playerHeight = 6.0f;           // {
-    public float playerWidth = 1.2f;            //      these will be changed dependant on character selection
-    public float runSpeed = 4.0f;               //      and change how the contoller will interact
-    public float jumpHeight = 15.0f;            // }
-    public int shotAccuracy = 5;
+    private bool groundedPlayer = false;                // system to allow jump mechanic and fix bugs from custom physics
+    private float gravityValue = -10.0f;                 // how stong gravity is // should be a universal value // maybe move to manager
+    private float playerHeight;                 // {
+    private float playerWidth;                  //      these will be changed dependant on character selection
+    private float runSpeed;                     //      and change how the contoller will interact
+    private float jumpHeight;                   // 
+    public int shotAccuracy;                   // }
+    public int characterSelect;
     public string spritePrefix;                 // can maybe use this to load different sprites for different characters in the future using the same script. NOT TESTED
 
     public bool possession = false;
 
     public GameObject manager;
-    public GameObject ball;
 
     private void Start()                        // maybe use a public state to determin stats ie. state 1 == default stats, state 2 == tall stats etc.
     {
         controller = gameObject.GetComponent<CharacterController>();
-        controller.radius = playerWidth;
-        controller.height = playerHeight;
+        switch (characterSelect)
+        {
+            case 1:
+                playerHeight = 6f;
+                playerWidth = 1.2f;
+                runSpeed = 6f;
+                jumpHeight = 1.5f;
+                shotAccuracy = 4;
+                // add any extra stats here. ie strength
+
+                controller.radius = playerWidth;
+                controller.height = playerHeight;
+                gameObject.transform.GetChild(0).transform.localScale = new Vector3 (2.8f, playerHeight,2.8f);      // sprite size
+                gameObject.transform.GetChild(1).transform.localPosition = new Vector3(0f, 4.75f, 0f);              // hand position
+                break;
+
+            case 2:
+                playerHeight = 8f;
+                playerWidth = 1.2f;
+                runSpeed = 4.75f;
+                jumpHeight = 1.7f;
+                shotAccuracy = 6;
+                // *
+
+                controller.radius = playerWidth;
+                controller.height = playerHeight;
+                gameObject.transform.GetChild(0).transform.localScale = new Vector3(2.8f, playerHeight, 2.8f);      // sprite size
+                gameObject.transform.GetChild(1).transform.localPosition = new Vector3(0f, 5.25f, 0f);              // hand position
+                break;
+
+            case 3:
+                playerHeight = 4.5f;
+                playerWidth = 1f;
+                runSpeed = 7.5f;
+                jumpHeight = 1.3f;
+                shotAccuracy = 5;
+                // *
+
+                controller.radius = playerWidth;
+                controller.height = playerHeight;
+                gameObject.transform.GetChild(0).transform.localScale = new Vector3(2.8f, playerHeight, 2.8f);      // sprite size
+                gameObject.transform.GetChild(1).transform.localPosition = new Vector3(0f, 3.5f, 0f);               // hand position
+
+                break;
+        }
     }
 
     void Update()
