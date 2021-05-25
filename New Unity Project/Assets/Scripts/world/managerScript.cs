@@ -17,6 +17,9 @@ public class managerScript : MonoBehaviour
 
     private int scoreP1 = 0;
     private int scoreP2 = 0;
+    private bool goal1 = false;                     // make sure the ball went through the hoop the correct way
+    private bool goal2 = false;
+
 
     private bool ballPossessed = false;             // locks certain actions happening when someone has possession of the ball
     private GameObject possessionTracker = null;    // tracks which player has the ball currently // used for calculating shot tragectory and setting the balls position to the hand
@@ -96,6 +99,24 @@ public class managerScript : MonoBehaviour
         ballShotCheck = false;                                                                                                  // reset shot check system
     }
 
+    // point has been scored
+    void pointScore()
+    {
+        if (lastPossessed == player1)
+        {
+            scoreP1 += 2;
+            Debug.Log(scoreP1);
+        }
+        else if (lastPossessed == player2)
+        {
+            scoreP2 += 2;
+            Debug.Log(scoreP2);
+        }
+
+        goal1 = false;
+        goal2 = false;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -127,6 +148,14 @@ public class managerScript : MonoBehaviour
                     lastPossessed = index.gameObject;
                 }
 
+                if (index.CompareTag("goal1"))
+                {
+                    goal1 = true;
+                }
+                if (index.CompareTag("goal2") && goal1)
+                {
+                    pointScore();
+                }
             }
 
         }
@@ -134,7 +163,14 @@ public class managerScript : MonoBehaviour
         // if a player attempts a shot then ball shot check will be changed to true
         if (ballShotCheck == true)
         {
+            goal1 = false;
+            goal2 = false;
             shotCall();
+        }
+
+        if (goal1 && goal2)
+        {
+            pointScore();
         }
     }
 }
