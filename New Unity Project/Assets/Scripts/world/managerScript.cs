@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class managerScript : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class managerScript : MonoBehaviour
     public GameObject player2;
     public GameObject player3;
     public GameObject player4;
+    public GameObject resultsScreen;
+
     public bool ballShotCheck = false;              // allows players to attempt a shot from outside this script by making this true
 
     private Collider[] ballCollisions;
@@ -19,7 +22,9 @@ public class managerScript : MonoBehaviour
     private int scoreP2 = 0;
     private bool goal1 = false;                     // make sure the ball went through the hoop the correct way
     private bool goal2 = false;
-
+    public Text p1Text;
+    public Text p2Text;
+    public Text winner;
 
     private bool ballPossessed = false;             // locks certain actions happening when someone has possession of the ball
     private GameObject possessionTracker = null;    // tracks which player has the ball currently // used for calculating shot tragectory and setting the balls position to the hand
@@ -53,6 +58,9 @@ public class managerScript : MonoBehaviour
 
         possessionTracker = _possessor;
         ballPossessed = _possessionLock;
+        winner.text = getPossessionTracker().name;
+
+        clearGoal();
     }
 
     // clear possession sets all possession variables to null
@@ -73,6 +81,7 @@ public class managerScript : MonoBehaviour
     // player attempts to shoot the ball
     void shotCall()
     {
+        clearGoal();
         float shotMod = 10;
         // calculate the shot accuracy based on shot takers stats
         if (getPossessionTracker() == player1)
@@ -102,17 +111,21 @@ public class managerScript : MonoBehaviour
     // point has been scored
     void pointScore()
     {
-        if (lastPossessed == player1)
-        {
-            scoreP1 += 2;
-            Debug.Log(scoreP1);
-        }
-        else if (lastPossessed == player2)
-        {
-            scoreP2 += 2;
-            Debug.Log(scoreP2);
-        }
+            if (lastPossessed == player1)
+            {
+                scoreP1 += 2;
+                p1Text.text = scoreP1.ToString();
+            }
+            else if (lastPossessed == player2)
+            {
+                scoreP2 += 2;
+                p2Text.text = scoreP2.ToString();
+            }
+        clearGoal();
+    }
 
+    void clearGoal()
+    {
         goal1 = false;
         goal2 = false;
     }
@@ -120,23 +133,24 @@ public class managerScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        
     }
-
-    // Update is called once per frame
     void Update()
     {
         //  if the ball is in possession of a player
         if (getBallPossessed() == true)
         {
-            ball.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);                    // set the ball velocity to 0 to prevent endlessly falling 
-            
-            
+            ball.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);                    // set the ball velocity to 0 to prevent endlessly falling 
+
+
             ball.GetComponent<SphereCollider>().enabled = false;                             // disabled to stop the ball trying to leave the set position   // re enable when no longer needed
             ball.transform.position = getPossessionTracker().transform.GetChild(1).position; // set ball position to the players hand position
         }
-
-        //   if the ball is not possessed by a player
+    }
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        //  if the ball is not possessed by a player
         if (getBallPossessed() == false)
         {
             ballCollisions = Physics.OverlapSphere(ball.transform.position, 0.55f);     // search for a player coliding with the ball
@@ -152,9 +166,14 @@ public class managerScript : MonoBehaviour
                 {
                     goal1 = true;
                 }
-                if (index.CompareTag("goal2") && goal1)
+                if (index.CompareTag("goal2"))
                 {
-                    pointScore();
+
+                    goal2 = true;
+                    if(goal1)
+                    { 
+                         pointScore();
+                    }
                 }
             }
 
@@ -163,14 +182,13 @@ public class managerScript : MonoBehaviour
         // if a player attempts a shot then ball shot check will be changed to true
         if (ballShotCheck == true)
         {
-            goal1 = false;
-            goal2 = false;
             shotCall();
         }
 
-        if (goal1 && goal2)
+        if (scoreP1 > 18 || scoreP2 > 18)
         {
-            pointScore();
+            resultsScreen.SetActive(true);
         }
+
     }
 }
