@@ -6,13 +6,14 @@ public class playerControllerScript : MonoBehaviour {
 
     private CharacterController controller;     // handles controls and physics
     private Vector3 playerVelocity;             
-    private bool groundedPlayer = false;                // system to allow jump mechanic and fix bugs from custom physics
-    private float gravityValue = -10.0f;                 // how stong gravity is // should be a universal value // maybe move to manager
+    private bool groundedPlayer = false;        // system to allow jump mechanic and fix bugs from custom physics
+    private bool canMove = true;                // lock movement based on certain actions such as after a jump with the ball (double dribble) or during center or post scoring
+    private float gravityValue = -10.0f;        // how stong gravity is // should be a universal value // maybe move to manager
     private float playerHeight;                 // {
     private float playerWidth;                  //      these will be changed dependant on character selection
     private float runSpeed;                     //      and change how the contoller will interact
     private float jumpHeight;                   // 
-    public int shotAccuracy;                   // }
+    public int shotAccuracy;                    // }
     public int characterSelect;
     public string spritePrefix;                 // can maybe use this to load different sprites for different characters in the future using the same script. NOT TESTED
 
@@ -22,6 +23,7 @@ public class playerControllerScript : MonoBehaviour {
 
     private void Start()                        // maybe use a public state to determin stats ie. state 1 == default stats, state 2 == tall stats etc.
     {
+        characterSelect = settingsScript.player1CharacterSelect;
         controller = gameObject.GetComponent<CharacterController>();
         switch (characterSelect)
         {
@@ -42,7 +44,7 @@ public class playerControllerScript : MonoBehaviour {
             case 2:
                 playerHeight = 8f;
                 playerWidth = 1.2f;
-                runSpeed = 4.75f;
+                runSpeed = 4.5f;
                 jumpHeight = 1.7f;
                 shotAccuracy = 6;
                 // *
@@ -86,7 +88,7 @@ public class playerControllerScript : MonoBehaviour {
 
 
         // only allow movement while grounded. this prevents movement while jumping (balancing)
-        if (groundedPlayer)
+        if (groundedPlayer && canMove)
         {
             if (move.magnitude >= 0.1f)
             {
@@ -95,20 +97,27 @@ public class playerControllerScript : MonoBehaviour {
             
         }
 
-
+        // JUMKP
         // when spacebar is pressed and the player is grounded do a jump based on jump height var
-        if (Input.GetKeyDown("k") && groundedPlayer)
+        if (Input.GetKeyDown("k") && groundedPlayer && canMove)
         {
             playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
             groundedPlayer = false;
+            
+            if (possession)         // if player had possession of the ball when they jumpedthey can no longer move
+            {
+                canMove = false;
+            }
         }
 
+        // SHOOT / TACKLE 
         // when j is pressed attempt a shot // shot function  is handled by the manager
         if (Input.GetKeyDown("j"))
         {
             if (possession == true)
             { 
                 manager.GetComponent<managerScript>().ballShotCheck = true;
+                canMove = true;     // after attempting a shot the player is allowed to move
             }
 
             if (possession == false)

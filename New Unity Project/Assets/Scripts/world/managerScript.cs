@@ -11,12 +11,17 @@ public class managerScript : MonoBehaviour
     public GameObject player2;
     public GameObject player3;
     public GameObject player4;
+    public bool ballShotCheck = false;              // allows players to attempt a shot from outside this script by making this true
 
     private Collider[] ballCollisions;
 
-    public bool ballShotCheck = false;              // allows players to attempt a shot from outside this script by making this true
+    private int scoreP1 = 0;
+    private int scoreP2 = 0;
+
     private bool ballPossessed = false;             // locks certain actions happening when someone has possession of the ball
     private GameObject possessionTracker = null;    // tracks which player has the ball currently // used for calculating shot tragectory and setting the balls position to the hand
+    private GameObject lastPossessed = null;        // track who last had the ball // used in score system and future game rules
+
 
     // is the ball in possession?
     bool getBallPossessed()
@@ -34,7 +39,15 @@ public class managerScript : MonoBehaviour
     // ( who has the ball now? , set to true )
     void setPossessionTracker(GameObject _possessor, bool _possessionLock)
     {
-        _possessor.gameObject.GetComponent<playerControllerScript>().possession = _possessionLock;
+        if (_possessor == player1)
+        {
+            _possessor.gameObject.GetComponent<playerControllerScript>().possession = _possessionLock;
+        }
+        else if (_possessor == player2)
+        {
+            _possessor.gameObject.GetComponent<player2ControllerScript>().possession = _possessionLock;
+        }
+
         possessionTracker = _possessor;
         ballPossessed = _possessionLock;
     }
@@ -42,7 +55,14 @@ public class managerScript : MonoBehaviour
     // clear possession sets all possession variables to null
     void clearPossession()
     {
-        getPossessionTracker().GetComponent<playerControllerScript>().possession = false;
+        if (getPossessionTracker() == player1)
+        {
+            getPossessionTracker().GetComponent<playerControllerScript>().possession = false;
+        }
+        else if (getPossessionTracker() == player2)
+        {
+            getPossessionTracker().GetComponent<player2ControllerScript>().possession = false;
+        }
         possessionTracker = null;
         ballPossessed = false;
     }
@@ -50,10 +70,19 @@ public class managerScript : MonoBehaviour
     // player attempts to shoot the ball
     void shotCall()
     {
+        float shotMod = 10;
         // calculate the shot accuracy based on shot takers stats
-        float asdef = getPossessionTracker().GetComponent<playerControllerScript>().shotAccuracy;                               // get the shot takers accuracy stat
-        asdef = (asdef / 10);                                                                                                   // turn shot acc stat into a decimal
-        asdef = Random.Range(-asdef, asdef);                                                                                    // use decimal as a random multiplier from negative stat to positive stat
+        if (getPossessionTracker() == player1)
+        {
+            shotMod = getPossessionTracker().GetComponent<playerControllerScript>().shotAccuracy;                               // get the shot takers accuracy stat
+        }
+        else if (getPossessionTracker() == player2)
+        {
+            shotMod = getPossessionTracker().GetComponent<player2ControllerScript>().shotAccuracy;                               // get the shot takers accuracy stat
+        }
+
+        shotMod = shotMod / 10;                                                                                                   // turn shot acc stat into a decimal
+        shotMod = Random.Range(-shotMod, shotMod);                                                                                    // use decimal as a random multiplier from negative stat to positive stat
 
         clearPossession();                                                                                                      // clear possession to stop the ball being forced onto the player hand pos            
 
@@ -61,7 +90,7 @@ public class managerScript : MonoBehaviour
 
         // apply a force to move the ball away from the player > towards the hoop                                  
         ball.GetComponent<Transform>().rotation = Quaternion.Euler(0, 0, 0);                                                    // reset rotation to prevent weird physics      
-        ball.GetComponent<Rigidbody>().AddForce(ball.transform.up * (7 + asdef), ForceMode.VelocityChange);                     // add force upwards to create an arc
+        ball.GetComponent<Rigidbody>().AddForce(ball.transform.up * (7 + shotMod), ForceMode.VelocityChange);                     // add force upwards to create an arc
         ball.GetComponent<Rigidbody>().AddForce((hoop.transform.position - ball.transform.position) * 0.8f, ForceMode.VelocityChange); // add force towards the hoop   
 
         ballShotCheck = false;                                                                                                  // reset shot check system
@@ -84,8 +113,6 @@ public class managerScript : MonoBehaviour
             
             ball.GetComponent<SphereCollider>().enabled = false;                             // disabled to stop the ball trying to leave the set position   // re enable when no longer needed
             ball.transform.position = getPossessionTracker().transform.GetChild(1).position; // set ball position to the players hand position
-
-
         }
 
         //   if the ball is not possessed by a player
@@ -97,6 +124,7 @@ public class managerScript : MonoBehaviour
                 if (index.CompareTag("playerEntity"))
                 {
                     setPossessionTracker(index.gameObject, true);                       // if a player is found set the player to the possession tracker
+                    lastPossessed = index.gameObject;
                 }
 
             }
