@@ -17,6 +17,7 @@ public class managerScript : MonoBehaviour
     public bool ballShotCheck = false;              // allows players to attempt a shot from outside this script by making this true
 
     private Collider[] ballCollisions;
+    private Collider[] tackleCheck;
 
     private int scoreP1 = 0;
     private int scoreP2 = 0;
@@ -29,7 +30,7 @@ public class managerScript : MonoBehaviour
     private bool ballPossessed = false;             // locks certain actions happening when someone has possession of the ball
     private GameObject possessionTracker = null;    // tracks which player has the ball currently // used for calculating shot tragectory and setting the balls position to the hand
     private GameObject lastPossessed = null;        // track who last had the ball // used in score system and future game rules
-
+    private GameObject tackleTarget;
 
     // is the ball in possession?
     bool getBallPossessed()
@@ -108,6 +109,30 @@ public class managerScript : MonoBehaviour
         ballShotCheck = false;                                                                                                  // reset shot check system
     }
 
+    public void tackle(GameObject _tackler)
+    {
+        Debug.Log("tackle called");
+        if (_tackler == player1)
+        {
+            tackleTarget = player2;
+        }
+        else if (_tackler == player2)
+        {
+            tackleTarget = player1;
+        }
+
+        tackleCheck = Physics.OverlapSphere(_tackler.transform.position, 1f);     // search for a player
+        foreach (Collider index in tackleCheck)
+        {
+            Debug.Log(index.gameObject.name);
+            if (index.gameObject == tackleTarget)
+            {
+                Debug.Log("ballfound");
+                clearPossession();
+                setPossessionTracker(_tackler, true);
+            }
+        }
+    }
     // point has been scored
     void pointScore()
     {

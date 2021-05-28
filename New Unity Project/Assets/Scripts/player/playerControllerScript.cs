@@ -14,6 +14,7 @@ public class playerControllerScript : MonoBehaviour {
     private float runSpeed;                     //      and change how the contoller will interact
     private float jumpHeight;                   // 
     public int shotAccuracy;                    // }
+    public int strength;
     public int characterSelect;
     public string spritePrefix;                 // can maybe use this to load different sprites for different characters in the future using the same script. NOT TESTED
 
@@ -33,6 +34,7 @@ public class playerControllerScript : MonoBehaviour {
                 runSpeed = 6f;
                 jumpHeight = 1.5f;
                 shotAccuracy = 4;
+                strength = 5;
                 // add any extra stats here. ie strength
 
                 controller.radius = playerWidth;
@@ -47,6 +49,7 @@ public class playerControllerScript : MonoBehaviour {
                 runSpeed = 4.5f;
                 jumpHeight = 1.7f;
                 shotAccuracy = 6;
+                strength = 8;
                 // *
 
                 controller.radius = playerWidth;
@@ -61,6 +64,7 @@ public class playerControllerScript : MonoBehaviour {
                 runSpeed = 7.5f;
                 jumpHeight = 1.3f;
                 shotAccuracy = 5;
+                strength = 2;
                 // *
 
                 controller.radius = playerWidth;
@@ -122,7 +126,7 @@ public class playerControllerScript : MonoBehaviour {
 
             if (possession == false)
             {
-                
+                manager.GetComponent<managerScript>().tackle(this.gameObject);
             }
         }
 
